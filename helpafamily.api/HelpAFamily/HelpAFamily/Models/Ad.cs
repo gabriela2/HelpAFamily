@@ -13,15 +13,25 @@ namespace HelpAFamily.Models
         [Required]
         [Key]
         public int Id { get; set; }
+        public int UserId { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
-        public float Quantity { get; set; }
         public DateTime CreatedAt { get; set; }
-        public int UserId { get; set; }
-        public string Picture { get; set; }
-        public int TypeId { get; set; }
+        public float Quantity { get; set; }
+        public int UnitOfMeasureTypeId { get; set; }
+        public float Limit { get; set; }
+        public int NumberOfPhotos { get; set; }
+        public int CategoryId { get; set; }
         public int DeliveryTypeId { get; set; }
-        public string Status { get; set; }
+        public int StatusId { get; set; }
+
+        public virtual UnitOfMeasureType UnitOfMeasureType { get; set; }
+        public virtual DeliveryType DeliveryType { get; set; }
+        public virtual Category Category { get; set; }
+        public virtual Status Status { get; set; }
+        public virtual User User { get; set; }
+        public List<Picture> Pictures { get; set; }
+
 
     }
 }
