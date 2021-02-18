@@ -24,6 +24,11 @@ namespace HelpAFamily.Models
 
         public virtual RoleType RoleTypes { get; set; }
         public virtual UserType UserTypes { get; set; }
-        
+        public List<Ad> Ads { get; set; }
+        public List<User_X_Address> User_X_Addresses { get; set; }
+        public List<Demand> Demands { get; set; }
+        public List<Chat> Chats{ get; set; }
+        public List<Donation> Donations{ get; set; }
+
     }
 }

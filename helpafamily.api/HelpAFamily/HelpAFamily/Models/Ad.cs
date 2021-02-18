@@ -30,6 +30,8 @@ namespace HelpAFamily.Models
         public virtual Category Category { get; set; }
         public virtual Status Status { get; set; }
         public virtual User User { get; set; }
+        public virtual List<Demand> Demands { get; set; }
+        public virtual Chat Chat { get; set; }
         public List<Picture> Pictures { get; set; }
 
 

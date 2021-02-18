@@ -7,17 +7,16 @@ using System.Threading.Tasks;
 
 namespace HelpAFamily.Models
 {
-    [Table("DeliveryTypes")]
-    public class DeliveryType
+    [Table("User_x_Address")]
+    public class User_X_Address
     {
         [Required]
         [Key]
         public int Id { get; set; }
-        public string Name { get; set; }
-        public string Description { get; set; }
-        public float Price { get; set; }
+        public int UserId { get; set; }
+        public int AddressId { get; set; }
 
-        public List<Ad> Ad { get; set; }
-        public List<Demand> Demands { get; set; }
+        public virtual User User { get; set; }
+        public virtual Address Address { get; set; }
     }
 }
