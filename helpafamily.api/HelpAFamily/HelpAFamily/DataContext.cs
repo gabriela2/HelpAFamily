@@ -51,10 +51,22 @@ namespace HelpAFamily
         public static DataContext Default
 => new DataContext(DefaultOptions);
 
-        public DbSet<User> Users { get; set; }
+        
         public DbSet<Ad> Ads { get; set; }
-
+        public DbSet<Address> Addresses { get; set; }
         public DbSet<Category> Categories { get; set; }
+        public DbSet<Chat> Chats { get; set; }
+        public DbSet<DeliveryType> DeliveryTypes { get; set; }
+        public DbSet<Demand> Demands { get; set; }
+        public DbSet<Donation> Donations { get; set; }
+        public DbSet<Picture> Pictures { get; set; }
+        public DbSet<RoleType> RoleTypes { get; set; }
+        public DbSet<Status> Statuses { get; set; }
+        public DbSet<UnitOfMeasureType> UnitOfMeasureTypes { get; set; }
+        public DbSet<User> Users { get; set; }
+        public DbSet<UserAddress> UserAddresses { get; set; }
+        public DbSet<UserType> UserTypes { get; set; }
+        
 
      
 

@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 
 namespace HelpAFamily.Models
 {
-    [Table("User_x_Address")]
-    public class User_X_Address
+    [Table("UserAddress")]
+    public class UserAddress
     {
         [Required]
         [Key]

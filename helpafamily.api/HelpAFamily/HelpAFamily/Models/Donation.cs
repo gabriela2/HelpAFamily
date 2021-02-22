@@ -18,8 +18,8 @@ namespace HelpAFamily.Models
         public DateTime CreatedAt { get; set; }
         public float Amount { get; set; }
 
-        public virtual User UserSender { get; set; }
-        public virtual User UserReceiver { get; set; }
+        public virtual User User { get; set; }
+        //public virtual User UserReceiver { get; set; }
         public virtual Chat Chat { get; set; }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -7,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace HelpAFamily.Models
 {
-    [Table ("Users")]
+    [Table("Users")]
     public class User
     {
         [Required]
@@ -25,10 +26,10 @@ namespace HelpAFamily.Models
         public virtual RoleType RoleTypes { get; set; }
         public virtual UserType UserTypes { get; set; }
         public List<Ad> Ads { get; set; }
-        public List<User_X_Address> User_X_Addresses { get; set; }
+        public List<UserAddress> User_X_Addresses { get; set; }
         public List<Demand> Demands { get; set; }
-        public List<Chat> Chats{ get; set; }
-        public List<Donation> Donations1{ get; set; }
+        public List<Chat> Chats { get; set; }
+        //public List<Donation> Donations1 { get; set; }
         public List<Donation> Donations { get; set; }
 
     }

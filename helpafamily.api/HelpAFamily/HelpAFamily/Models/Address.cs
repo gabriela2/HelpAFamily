@@ -19,7 +19,7 @@ namespace HelpAFamily.Models
         public string State { get; set; }
         public int Zipcode { get; set; }
 
-        public List<User_X_Address> User_X_Addresses { get; set; }
+        public List<UserAddress> UserAddresses { get; set; }
 
     }
 }
