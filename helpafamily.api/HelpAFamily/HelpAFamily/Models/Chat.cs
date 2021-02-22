@@ -22,8 +22,8 @@ namespace HelpAFamily.Models
         public DateTime MessageSent { get; set; }
         public bool SenderDeleted { get; set; }
         public bool ReceiverDeleted { get; set; }
-        public int DonationId { get; set; }
-        public int AdId { get; set; }
+        public int? DonationId { get; set; }
+        public int? AdId { get; set; }
 
         public virtual Donation Donation { get; set; }
         public virtual Ad Ad { get; set; }

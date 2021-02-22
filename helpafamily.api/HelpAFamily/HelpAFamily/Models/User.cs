@@ -19,8 +19,8 @@ namespace HelpAFamily.Models
         public string LastName { get; set; }
         public byte[] PasswordHash { get; set; }
         public byte[] PasswordSalt { get; set; }
-        public int RoleTypeId { get; set; }
-        public int UserTypeId { get; set; }
+        public int? RoleTypeId { get; set; }
+        public int? UserTypeId { get; set; }
 
         public virtual RoleType RoleTypes { get; set; }
         public virtual UserType UserTypes { get; set; }
@@ -28,7 +28,8 @@ namespace HelpAFamily.Models
         public List<User_X_Address> User_X_Addresses { get; set; }
         public List<Demand> Demands { get; set; }
         public List<Chat> Chats{ get; set; }
-        public List<Donation> Donations{ get; set; }
+        public List<Donation> Donations1{ get; set; }
+        public List<Donation> Donations { get; set; }
 
     }
 }

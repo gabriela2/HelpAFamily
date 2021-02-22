@@ -1,59 +1,96 @@
+using System.Text;
+
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using Microsoft.OpenApi.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 
 namespace HelpAFamily
 {
-    public class Startup
-    {
-        public Startup(IConfiguration configuration)
-        {
-            Configuration = configuration;
-        }
+	public class Startup
+	{
+		public IConfiguration Configuration { get; }
+		public Startup(IConfiguration configuration)
+		{
+			this.Configuration = configuration;
+		}
 
-        public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
-        public void ConfigureServices(IServiceCollection services)
-        {
+		// This method gets called by the runtime. Use this method to add services to the container.
+		public void ConfigureServices(IServiceCollection services)
+		{
+			services.AddCors(o => o.AddPolicy("MyPolicy", builder =>
+			{
+				builder.AllowAnyOrigin()
+					   .AllowAnyMethod()
+					   .AllowAnyHeader();
+			}));
 
-            services.AddControllers();
-            services.AddSwaggerGen(c =>
-            {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "HelpAFamily", Version = "v1" });
-            });
-        }
+			// for LOOP services.AddControllers();
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
-        {
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-                app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "HelpAFamily v1"));
-            }
+			services.AddControllers().AddNewtonsoftJson(options =>
+			{
+				options.SerializerSettings.ContractResolver = new DefaultContractResolver();
+				options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+			});
 
-            app.UseHttpsRedirection();
 
-            app.UseRouting();
+			// Register the Swagger generator, defining 1 or more Swagger documents
+			services.AddSwaggerGen();
 
-            app.UseAuthorization();
+			services.AddDbContext<DataContext>(
+				sql => sql.UseSqlServer(@"Server=.\; Database=HelpAFamily; Trusted_Connection=true;")
+				);
 
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllers();
-            });
-        }
-    }
+			DbContextOptionsBuilder<DataContext> ob = new DbContextOptionsBuilder<DataContext>();
+			ob.UseSqlServer(@"Server=.\; Database=HelpAFamily; Trusted_Connection=true;");
+			DataContext.DefaultOptions = ob.Options;
+			new DataContext(DataContext.DefaultOptions).Database.EnsureCreated();
+			services.AddScoped<DataContext>();
+		}
+
+		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+		public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+		{
+
+			// Enable middleware to serve generated Swagger as a JSON endpoint.
+			app.UseSwagger();
+
+
+			app.UseCors("MyPolicy");
+			if (env.IsDevelopment())
+			{
+				app.UseDeveloperExceptionPage();
+			}
+
+			app.UseHttpsRedirection();
+
+
+
+			// Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.),
+			// specifying the Swagger JSON endpoint.
+			app.UseSwaggerUI(c =>
+			{
+				c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
+
+				// set swagger the main page
+
+				// c.RoutePrefix = "";
+			});
+
+
+			app.UseRouting();
+
+			app.UseAuthorization();
+
+			app.UseEndpoints(endpoints =>
+			{
+				endpoints.MapControllers();
+			});
+		}
+	}
 }

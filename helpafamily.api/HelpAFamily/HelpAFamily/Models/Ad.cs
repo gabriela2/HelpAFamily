@@ -18,12 +18,12 @@ namespace HelpAFamily.Models
         public string Description { get; set; }
         public DateTime CreatedAt { get; set; }
         public float Quantity { get; set; }
-        public int UnitOfMeasureTypeId { get; set; }
+        public int? UnitOfMeasureTypeId { get; set; }
         public float Limit { get; set; }
         public int NumberOfPhotos { get; set; }
-        public int CategoryId { get; set; }
-        public int DeliveryTypeId { get; set; }
-        public int StatusId { get; set; }
+        public int? CategoryId { get; set; }
+        public int? DeliveryTypeId { get; set; }
+        public int? StatusId { get; set; }
 
         public virtual UnitOfMeasureType UnitOfMeasureType { get; set; }
         public virtual DeliveryType DeliveryType { get; set; }

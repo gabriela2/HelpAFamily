@@ -17,7 +17,7 @@ namespace HelpAFamily.Models
         public int AdId { get; set; }
         public DateTime CreatedAt { get; set; }
         public float Quantity { get; set; }
-        public int DeliveryTypeId { get; set; }
+        public int? DeliveryTypeId { get; set; }
 
         public virtual User User { get; set; }
         public virtual Ad Ad { get; set; }

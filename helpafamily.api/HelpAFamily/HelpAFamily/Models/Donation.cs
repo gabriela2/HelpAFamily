@@ -13,12 +13,13 @@ namespace HelpAFamily.Models
         [Required]
         [Key]
         public int Id { get; set; }
-        public int SenderId { get; set; }
-        public int ReceiverId { get; set; }
+        public int UserSenderId { get; set; }
+        public int UserReceiverId { get; set; }
         public DateTime CreatedAt { get; set; }
         public float Amount { get; set; }
 
-        public virtual User User { get; set; }
+        public virtual User UserSender { get; set; }
+        public virtual User UserReceiver { get; set; }
         public virtual Chat Chat { get; set; }
     }
 }
