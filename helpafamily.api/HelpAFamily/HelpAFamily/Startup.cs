@@ -76,10 +76,7 @@ namespace HelpAFamily
 			app.UseSwaggerUI(c =>
 			{
 				c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
-
-				// set swagger the main page
-
-				// c.RoutePrefix = "";
+				//c.RoutePrefix = string.Empty;
 			});
 
 
