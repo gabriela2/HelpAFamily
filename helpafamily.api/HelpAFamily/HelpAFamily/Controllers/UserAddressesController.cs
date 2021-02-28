@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using HelpAFamily;
 using HelpAFamily.Models;
@@ -12,7 +12,7 @@ namespace HelpAFamily.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class UserAddressesController : Controller
+    public class UserAddressesController : ControllerBase
     {
         private readonly DataContext _context;
 
@@ -21,143 +21,83 @@ namespace HelpAFamily.Controllers
             _context = context;
         }
 
-        // GET: UserAddresses
-        public async Task<IActionResult> Index()
+        // GET: api/UserAddresses
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<UserAddress>>> GetUserAddresses()
         {
-            var dataContext = _context.UserAddresses.Include(u => u.Address).Include(u => u.User);
-            return View(await dataContext.ToListAsync());
+            return await _context.UserAddresses.ToListAsync();
         }
 
-        // GET: UserAddresses/Details/5
-        public async Task<IActionResult> Details(int? id)
+        // GET: api/UserAddresses/5
+        [HttpGet("{id}")]
+        public async Task<ActionResult<UserAddress>> GetUserAddress(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var userAddress = await _context.UserAddresses
-                .Include(u => u.Address)
-                .Include(u => u.User)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (userAddress == null)
-            {
-                return NotFound();
-            }
-
-            return View(userAddress);
-        }
-
-        // GET: UserAddresses/Create
-        public IActionResult Create()
-        {
-            ViewData["AddressId"] = new SelectList(_context.Addresses, "Id", "Id");
-            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id");
-            return View();
-        }
-
-        // POST: UserAddresses/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,UserId,AddressId")] UserAddress userAddress)
-        {
-            if (ModelState.IsValid)
-            {
-                _context.Add(userAddress);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["AddressId"] = new SelectList(_context.Addresses, "Id", "Id", userAddress.AddressId);
-            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", userAddress.UserId);
-            return View(userAddress);
-        }
-
-        // GET: UserAddresses/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
             var userAddress = await _context.UserAddresses.FindAsync(id);
+
             if (userAddress == null)
             {
                 return NotFound();
             }
-            ViewData["AddressId"] = new SelectList(_context.Addresses, "Id", "Id", userAddress.AddressId);
-            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", userAddress.UserId);
-            return View(userAddress);
+
+            return userAddress;
         }
 
-        // POST: UserAddresses/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,UserId,AddressId")] UserAddress userAddress)
+        // PUT: api/UserAddresses/5
+        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [HttpPut("{id}")]
+        public async Task<IActionResult> PutUserAddress(int id, UserAddress userAddress)
         {
             if (id != userAddress.Id)
             {
-                return NotFound();
+                return BadRequest();
             }
 
-            if (ModelState.IsValid)
+            _context.Entry(userAddress).State = EntityState.Modified;
+
+            try
             {
-                try
-                {
-                    _context.Update(userAddress);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!UserAddressExists(userAddress.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
+                await _context.SaveChangesAsync();
             }
-            ViewData["AddressId"] = new SelectList(_context.Addresses, "Id", "Id", userAddress.AddressId);
-            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", userAddress.UserId);
-            return View(userAddress);
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!UserAddressExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return NoContent();
         }
 
-        // GET: UserAddresses/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        // POST: api/UserAddresses
+        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [HttpPost]
+        public async Task<ActionResult<UserAddress>> PostUserAddress(UserAddress userAddress)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            _context.UserAddresses.Add(userAddress);
+            await _context.SaveChangesAsync();
 
-            var userAddress = await _context.UserAddresses
-                .Include(u => u.Address)
-                .Include(u => u.User)
-                .FirstOrDefaultAsync(m => m.Id == id);
+            return CreatedAtAction("GetUserAddress", new { id = userAddress.Id }, userAddress);
+        }
+
+        // DELETE: api/UserAddresses/5
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteUserAddress(int id)
+        {
+            var userAddress = await _context.UserAddresses.FindAsync(id);
             if (userAddress == null)
             {
                 return NotFound();
             }
 
-            return View(userAddress);
-        }
-
-        // POST: UserAddresses/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var userAddress = await _context.UserAddresses.FindAsync(id);
             _context.UserAddresses.Remove(userAddress);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+
+            return NoContent();
         }
 
         private bool UserAddressExists(int id)

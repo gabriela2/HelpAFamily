@@ -25,7 +25,7 @@ namespace HelpAFamily.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Ad>>> GetAds()
         {
-            return await _context.Ads.Include(a=> a.Category).ToListAsync();
+            return await _context.Ads.ToListAsync();
         }
 
         // GET: api/Ads/5

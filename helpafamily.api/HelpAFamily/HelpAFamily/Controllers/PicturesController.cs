@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using HelpAFamily;
 using HelpAFamily.Models;
@@ -12,7 +12,7 @@ namespace HelpAFamily.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class PicturesController : Controller
+    public class PicturesController : ControllerBase
     {
         private readonly DataContext _context;
 
@@ -21,137 +21,83 @@ namespace HelpAFamily.Controllers
             _context = context;
         }
 
-        // GET: Pictures
-        public async Task<IActionResult> Index()
+        // GET: api/Pictures
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<Picture>>> GetPictures()
         {
-            var dataContext = _context.Pictures.Include(p => p.Ad);
-            return View(await dataContext.ToListAsync());
+            return await _context.Pictures.ToListAsync();
         }
 
-        // GET: Pictures/Details/5
-        public async Task<IActionResult> Details(int? id)
+        // GET: api/Pictures/5
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Picture>> GetPicture(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var picture = await _context.Pictures
-                .Include(p => p.Ad)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (picture == null)
-            {
-                return NotFound();
-            }
-
-            return View(picture);
-        }
-
-        // GET: Pictures/Create
-        public IActionResult Create()
-        {
-            ViewData["AdId"] = new SelectList(_context.Ads, "Id", "Id");
-            return View();
-        }
-
-        // POST: Pictures/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,AdId,Name")] Picture picture)
-        {
-            if (ModelState.IsValid)
-            {
-                _context.Add(picture);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["AdId"] = new SelectList(_context.Ads, "Id", "Id", picture.AdId);
-            return View(picture);
-        }
-
-        // GET: Pictures/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
             var picture = await _context.Pictures.FindAsync(id);
+
             if (picture == null)
             {
                 return NotFound();
             }
-            ViewData["AdId"] = new SelectList(_context.Ads, "Id", "Id", picture.AdId);
-            return View(picture);
+
+            return picture;
         }
 
-        // POST: Pictures/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,AdId,Name")] Picture picture)
+        // PUT: api/Pictures/5
+        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [HttpPut("{id}")]
+        public async Task<IActionResult> PutPicture(int id, Picture picture)
         {
             if (id != picture.Id)
             {
-                return NotFound();
+                return BadRequest();
             }
 
-            if (ModelState.IsValid)
+            _context.Entry(picture).State = EntityState.Modified;
+
+            try
             {
-                try
-                {
-                    _context.Update(picture);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!PictureExists(picture.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
+                await _context.SaveChangesAsync();
             }
-            ViewData["AdId"] = new SelectList(_context.Ads, "Id", "Id", picture.AdId);
-            return View(picture);
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!PictureExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return NoContent();
         }
 
-        // GET: Pictures/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        // POST: api/Pictures
+        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [HttpPost]
+        public async Task<ActionResult<Picture>> PostPicture(Picture picture)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            _context.Pictures.Add(picture);
+            await _context.SaveChangesAsync();
 
-            var picture = await _context.Pictures
-                .Include(p => p.Ad)
-                .FirstOrDefaultAsync(m => m.Id == id);
+            return CreatedAtAction("GetPicture", new { id = picture.Id }, picture);
+        }
+
+        // DELETE: api/Pictures/5
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeletePicture(int id)
+        {
+            var picture = await _context.Pictures.FindAsync(id);
             if (picture == null)
             {
                 return NotFound();
             }
 
-            return View(picture);
-        }
-
-        // POST: Pictures/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var picture = await _context.Pictures.FindAsync(id);
             _context.Pictures.Remove(picture);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+
+            return NoContent();
         }
 
         private bool PictureExists(int id)

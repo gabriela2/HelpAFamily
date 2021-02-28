@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using HelpAFamily;
 using HelpAFamily.Models;
@@ -12,7 +12,7 @@ namespace HelpAFamily.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class DeliveryTypesController : Controller
+    public class DeliveryTypesController : ControllerBase
     {
         private readonly DataContext _context;
 
@@ -21,130 +21,83 @@ namespace HelpAFamily.Controllers
             _context = context;
         }
 
-        // GET: DeliveryTypes
-        public async Task<IActionResult> Index()
+        // GET: api/DeliveryTypes
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<DeliveryType>>> GetDeliveryTypes()
         {
-            return View(await _context.DeliveryTypes.ToListAsync());
+            return await _context.DeliveryTypes.ToListAsync();
         }
 
-        // GET: DeliveryTypes/Details/5
-        public async Task<IActionResult> Details(int? id)
+        // GET: api/DeliveryTypes/5
+        [HttpGet("{id}")]
+        public async Task<ActionResult<DeliveryType>> GetDeliveryType(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var deliveryType = await _context.DeliveryTypes
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (deliveryType == null)
-            {
-                return NotFound();
-            }
-
-            return View(deliveryType);
-        }
-
-        // GET: DeliveryTypes/Create
-        public IActionResult Create()
-        {
-            return View();
-        }
-
-        // POST: DeliveryTypes/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Description,Price")] DeliveryType deliveryType)
-        {
-            if (ModelState.IsValid)
-            {
-                _context.Add(deliveryType);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            return View(deliveryType);
-        }
-
-        // GET: DeliveryTypes/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
             var deliveryType = await _context.DeliveryTypes.FindAsync(id);
+
             if (deliveryType == null)
             {
                 return NotFound();
             }
-            return View(deliveryType);
+
+            return deliveryType;
         }
 
-        // POST: DeliveryTypes/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Description,Price")] DeliveryType deliveryType)
+        // PUT: api/DeliveryTypes/5
+        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [HttpPut("{id}")]
+        public async Task<IActionResult> PutDeliveryType(int id, DeliveryType deliveryType)
         {
             if (id != deliveryType.Id)
             {
-                return NotFound();
+                return BadRequest();
             }
 
-            if (ModelState.IsValid)
+            _context.Entry(deliveryType).State = EntityState.Modified;
+
+            try
             {
-                try
-                {
-                    _context.Update(deliveryType);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!DeliveryTypeExists(deliveryType.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
+                await _context.SaveChangesAsync();
             }
-            return View(deliveryType);
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!DeliveryTypeExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return NoContent();
         }
 
-        // GET: DeliveryTypes/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        // POST: api/DeliveryTypes
+        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [HttpPost]
+        public async Task<ActionResult<DeliveryType>> PostDeliveryType(DeliveryType deliveryType)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            _context.DeliveryTypes.Add(deliveryType);
+            await _context.SaveChangesAsync();
 
-            var deliveryType = await _context.DeliveryTypes
-                .FirstOrDefaultAsync(m => m.Id == id);
+            return CreatedAtAction("GetDeliveryType", new { id = deliveryType.Id }, deliveryType);
+        }
+
+        // DELETE: api/DeliveryTypes/5
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteDeliveryType(int id)
+        {
+            var deliveryType = await _context.DeliveryTypes.FindAsync(id);
             if (deliveryType == null)
             {
                 return NotFound();
             }
 
-            return View(deliveryType);
-        }
-
-        // POST: DeliveryTypes/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var deliveryType = await _context.DeliveryTypes.FindAsync(id);
             _context.DeliveryTypes.Remove(deliveryType);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+
+            return NoContent();
         }
 
         private bool DeliveryTypeExists(int id)

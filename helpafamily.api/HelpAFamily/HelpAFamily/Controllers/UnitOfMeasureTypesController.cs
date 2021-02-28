@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using HelpAFamily;
 using HelpAFamily.Models;
@@ -12,7 +12,7 @@ namespace HelpAFamily.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class UnitOfMeasureTypesController : Controller
+    public class UnitOfMeasureTypesController : ControllerBase
     {
         private readonly DataContext _context;
 
@@ -21,130 +21,83 @@ namespace HelpAFamily.Controllers
             _context = context;
         }
 
-        // GET: UnitOfMeasureTypes
-        public async Task<IActionResult> Index()
+        // GET: api/UnitOfMeasureTypes
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<UnitOfMeasureType>>> GetUnitOfMeasureTypes()
         {
-            return View(await _context.UnitOfMeasureTypes.ToListAsync());
+            return await _context.UnitOfMeasureTypes.ToListAsync();
         }
 
-        // GET: UnitOfMeasureTypes/Details/5
-        public async Task<IActionResult> Details(int? id)
+        // GET: api/UnitOfMeasureTypes/5
+        [HttpGet("{id}")]
+        public async Task<ActionResult<UnitOfMeasureType>> GetUnitOfMeasureType(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var unitOfMeasureType = await _context.UnitOfMeasureTypes
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (unitOfMeasureType == null)
-            {
-                return NotFound();
-            }
-
-            return View(unitOfMeasureType);
-        }
-
-        // GET: UnitOfMeasureTypes/Create
-        public IActionResult Create()
-        {
-            return View();
-        }
-
-        // POST: UnitOfMeasureTypes/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Description")] UnitOfMeasureType unitOfMeasureType)
-        {
-            if (ModelState.IsValid)
-            {
-                _context.Add(unitOfMeasureType);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            return View(unitOfMeasureType);
-        }
-
-        // GET: UnitOfMeasureTypes/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
             var unitOfMeasureType = await _context.UnitOfMeasureTypes.FindAsync(id);
+
             if (unitOfMeasureType == null)
             {
                 return NotFound();
             }
-            return View(unitOfMeasureType);
+
+            return unitOfMeasureType;
         }
 
-        // POST: UnitOfMeasureTypes/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Description")] UnitOfMeasureType unitOfMeasureType)
+        // PUT: api/UnitOfMeasureTypes/5
+        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [HttpPut("{id}")]
+        public async Task<IActionResult> PutUnitOfMeasureType(int id, UnitOfMeasureType unitOfMeasureType)
         {
             if (id != unitOfMeasureType.Id)
             {
-                return NotFound();
+                return BadRequest();
             }
 
-            if (ModelState.IsValid)
+            _context.Entry(unitOfMeasureType).State = EntityState.Modified;
+
+            try
             {
-                try
-                {
-                    _context.Update(unitOfMeasureType);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!UnitOfMeasureTypeExists(unitOfMeasureType.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
+                await _context.SaveChangesAsync();
             }
-            return View(unitOfMeasureType);
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!UnitOfMeasureTypeExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return NoContent();
         }
 
-        // GET: UnitOfMeasureTypes/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        // POST: api/UnitOfMeasureTypes
+        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [HttpPost]
+        public async Task<ActionResult<UnitOfMeasureType>> PostUnitOfMeasureType(UnitOfMeasureType unitOfMeasureType)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            _context.UnitOfMeasureTypes.Add(unitOfMeasureType);
+            await _context.SaveChangesAsync();
 
-            var unitOfMeasureType = await _context.UnitOfMeasureTypes
-                .FirstOrDefaultAsync(m => m.Id == id);
+            return CreatedAtAction("GetUnitOfMeasureType", new { id = unitOfMeasureType.Id }, unitOfMeasureType);
+        }
+
+        // DELETE: api/UnitOfMeasureTypes/5
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteUnitOfMeasureType(int id)
+        {
+            var unitOfMeasureType = await _context.UnitOfMeasureTypes.FindAsync(id);
             if (unitOfMeasureType == null)
             {
                 return NotFound();
             }
 
-            return View(unitOfMeasureType);
-        }
-
-        // POST: UnitOfMeasureTypes/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var unitOfMeasureType = await _context.UnitOfMeasureTypes.FindAsync(id);
             _context.UnitOfMeasureTypes.Remove(unitOfMeasureType);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+
+            return NoContent();
         }
 
         private bool UnitOfMeasureTypeExists(int id)
